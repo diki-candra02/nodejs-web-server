@@ -5,24 +5,34 @@ const requestListener = (request, response) => {
  
     response.statusCode = 200;
 
-    const { method } = request;
+    const { url, method } = request;
 
-    if(method === 'GET'){
-        response.end('<h1>Hello!</h1>');
-    }
+    if(url === '/'){
+        if(method === 'GET'){
+            response.end('<h1>Hello!</h1>');
+        }else{
+            response.end(`<h1>anda tidak dapat mengakses dengan<b>${method}</b>`);
+        }
+    }else if(url === '/about'){
+        if(method === 'GET'){
+            response.end('<h1>Halo! Ini adalah halaman about</h1>');
+        }else if(method === 'POST'){
+            let body = [];
 
-    if(method === 'POST'){
-        let body = [];
+            request.on('data', (chuck) => {
+                body.push(chuck);
+            })
 
-        request.on('data', (chuck) => {
-            body.push(chuck);
-        })
-
-        request.on('end', () => {
-            body = Buffer.concat(body).toString();
-            const { name } = JSON.parse(body);
-            response.end(`<h1>Hello, ${name}!</h1>`);
-        });
+            request.on('end', () => {
+                body = Buffer.concat(body).toString();
+                const { name } = JSON.parse(body);
+                response.end(`<h1>Halo, ${name}! Ini adalah halaman about</h1>`);
+            })
+        }else{
+            response.end(`<h1>anda tidak dapat mengakses dengan<b>${method}</b>`);
+        }
+    }else{
+        response.end('Halaman tidak ditemukan!');
     }
 };
  
